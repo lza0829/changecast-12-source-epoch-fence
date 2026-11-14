@@ -34,7 +34,7 @@ watch([streamId, includeDeleted], async () => {
 <template>
   <div class="page">
     <h1>投影快照</h1>
-    <p class="muted">当前投影行：实体键、最近应用 seq、载荷与删除态。与批次计数互证。</p>
+    <p class="muted">当前投影行：实体键、写入世代的 epoch、最近应用 seq、载荷与删除态。与批次计数互证。</p>
     <p v-if="err" class="tag danger">{{ err }}</p>
     <div class="panel" style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end">
       <label>
@@ -53,13 +53,14 @@ watch([streamId, includeDeleted], async () => {
       <table>
         <thead>
           <tr>
-            <th>流</th><th>实体键</th><th>seq</th><th>事件</th><th>状态</th><th>载荷</th><th>更新时间</th>
+            <th>流</th><th>实体键</th><th>epoch</th><th>seq</th><th>事件</th><th>状态</th><th>载荷</th><th>更新时间</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="r in rows" :key="r.id">
             <td>{{ r.stream_title }}</td>
             <td class="mono">{{ r.entity_key }}</td>
+            <td class="mono">{{ r.applied_epoch }}</td>
             <td class="mono">{{ r.applied_seq }}</td>
             <td class="mono">{{ r.applied_event_id }}</td>
             <td>
@@ -68,7 +69,7 @@ watch([streamId, includeDeleted], async () => {
             <td class="mono">{{ r.payload == null ? '—' : JSON.stringify(r.payload) }}</td>
             <td class="mono">{{ r.updated_at }}</td>
           </tr>
-          <tr v-if="!rows.length"><td colspan="7" class="muted">暂无投影，先去投影台跑一趟。</td></tr>
+          <tr v-if="!rows.length"><td colspan="8" class="muted">暂无投影，先去投影台跑一趟。</td></tr>
         </tbody>
       </table>
     </div>

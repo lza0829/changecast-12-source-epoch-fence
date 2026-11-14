@@ -16,6 +16,7 @@
         <router-link to="/batches">应用批次</router-link>
         <router-link to="/events">事件留痕</router-link>
         <router-link to="/buffer">缓冲区</router-link>
+        <router-link to="/epoch">世代围栏</router-link>
         <router-link to="/settings">设置</router-link>
       </nav>
     </header>

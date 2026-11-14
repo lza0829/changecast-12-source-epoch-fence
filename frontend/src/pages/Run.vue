@@ -36,7 +36,7 @@ onMounted(async () => {
 <template>
   <div class="page">
     <h1>投影台</h1>
-    <p class="muted">选一条投影流，读取 CDC 夹具并按 seq 应用到投影表。底座策略：按事件序投影，软删除留墓碑行。</p>
+    <p class="muted">选一条投影流，读取 CDC 夹具当前阶段并按 seq 应用。每趟推进夹具一阶段；夹具宣告提升 epoch 时原子切换围栏，旧世代事件按策略拒绝或入旁路桶。</p>
     <p v-if="err" class="tag danger">{{ err }}</p>
 
     <div class="panel">
@@ -60,13 +60,21 @@ onMounted(async () => {
       <h3 style="margin-top:0">最近一趟</h3>
       <p>
         批次 <span class="mono">{{ last.batch_no }}</span> · {{ last.stream_title }} ·
-        <span class="tag ok">{{ last.status }}</span>
+        <span class="tag ok">{{ last.status }}</span> ·
+        应用后 epoch <span class="tag">{{ last.epoch_after }}</span>
+        <span v-if="last.epoch_bump" class="tag warn">
+          本趟宣告提升 {{ last.epoch_bump.from_epoch }} → {{ last.epoch_bump.to_epoch }}
+          （缓冲 {{ last.epoch_bump.buffered_seen }}，迁旁路 {{ last.epoch_bump.buffered_migrated }}，拒绝 {{ last.epoch_bump.buffered_rejected }}）
+        </span>
+        <span v-if="last.fixture_stage" class="tag">夹具阶段 {{ last.fixture_stage }}/{{ last.fixture_stage_count }}</span>
       </p>
       <div class="stat-grid">
         <div class="stat"><div class="stat-num">{{ last.source_events }}</div><div class="stat-label">源事件</div></div>
         <div class="stat"><div class="stat-num">{{ last.applied_upsert }}</div><div class="stat-label">写入</div></div>
         <div class="stat"><div class="stat-num">{{ last.applied_delete }}</div><div class="stat-label">删除</div></div>
         <div class="stat"><div class="stat-num">{{ last.skipped_duplicate }}</div><div class="stat-label">跳过重复</div></div>
+        <div class="stat"><div class="stat-num">{{ last.epoch_rejected }}</div><div class="stat-label">世代拒绝</div></div>
+        <div class="stat"><div class="stat-num">{{ last.epoch_bypassed }}</div><div class="stat-label">旁路入桶</div></div>
         <div class="stat"><div class="stat-num">{{ last.projected_alive }}</div><div class="stat-label">存活</div></div>
         <div class="stat"><div class="stat-num">{{ last.projected_deleted }}</div><div class="stat-label">已删</div></div>
       </div>
@@ -74,6 +82,8 @@ onMounted(async () => {
         <router-link :to="{ path: '/projections', query: { stream_id: last.stream_id } }">查看投影快照 →</router-link>
         ·
         <router-link :to="{ path: '/events', query: { batch_id: last.id } }">事件留痕 →</router-link>
+        ·
+        <router-link to="/epoch">世代围栏 →</router-link>
       </p>
     </div>
 

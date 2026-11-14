@@ -4,6 +4,15 @@ import { useRoute } from 'vue-router'
 import { getJSON } from '../api'
 
 const route = useRoute()
+const RESULT_LABELS = {
+  applied_upsert: '写入',
+  applied_delete: '删除',
+  skipped_duplicate: '跳过重复',
+  rejected_late_epoch: '旧世代拒绝',
+  rejected_ahead_epoch: '未宣告世代拒绝',
+  bypassed_late_epoch: '旧世代旁路',
+}
+function resultLabel(r) { return RESULT_LABELS[r] || r }
 const rows = ref([])
 const batchId = ref(null)
 const err = ref('')
@@ -30,7 +39,7 @@ watch(batchId, async () => {
 <template>
   <div class="page">
     <h1>事件留痕</h1>
-    <p class="muted">本批（或全部）已处理事件：结果为写入 / 删除 / 跳过重复。</p>
+    <p class="muted">本批（或全部）已处理事件：写入 / 删除 / 跳过重复 / 旧世代拒绝 / 旧世代旁路。</p>
     <p v-if="err" class="tag danger">{{ err }}</p>
     <div class="panel" style="display:flex;gap:0.75rem;align-items:flex-end">
       <label>
@@ -43,7 +52,7 @@ watch(batchId, async () => {
       <table>
         <thead>
           <tr>
-            <th>批次</th><th>event_id</th><th>实体键</th><th>op</th><th>seq</th><th>事件时间</th><th>结果</th>
+            <th>批次</th><th>event_id</th><th>实体键</th><th>op</th><th>seq</th><th>epoch</th><th>事件时间</th><th>结果</th>
           </tr>
         </thead>
         <tbody>
@@ -53,10 +62,15 @@ watch(batchId, async () => {
             <td class="mono">{{ e.entity_key }}</td>
             <td class="mono">{{ e.op }}</td>
             <td class="mono">{{ e.seq }}</td>
+            <td class="mono">{{ e.epoch }}</td>
             <td class="mono">{{ e.event_time }}</td>
-            <td><span class="tag">{{ e.result }}</span></td>
+                        <td>
+              <span class="tag" :class="e.result.startsWith('rejected') ? 'danger' : e.result === 'bypassed_late_epoch' ? 'warn' : ''">
+                {{ resultLabel(e.result) }}
+              </span>
+            </td>
           </tr>
-          <tr v-if="!rows.length"><td colspan="7" class="muted">暂无留痕。</td></tr>
+          <tr v-if="!rows.length"><td colspan="8" class="muted">暂无留痕。</td></tr>
         </tbody>
       </table>
     </div>

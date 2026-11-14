@@ -14,13 +14,20 @@ def insert_batch(
     counts: dict[str, int],
     note: str | None,
     created_at: str,
+    epoch_after: int = 0,
+    epoch_bumped_from: int | None = None,
+    epoch_bumped_to: int | None = None,
 ) -> int:
+    epoch_rejected = int(counts.get("epoch_rejected", 0))
+    epoch_bypassed = int(counts.get("epoch_bypassed", 0))
     cur = conn.execute(
         """
         INSERT INTO project_batches(
             batch_no, stream_id, status, source_events, applied_upsert, applied_delete,
-            skipped_duplicate, projected_alive, projected_deleted, max_seq, note, created_at
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+            skipped_duplicate, projected_alive, projected_deleted, max_seq,
+            epoch_after, epoch_bumped_from, epoch_bumped_to,
+            epoch_rejected, epoch_bypassed, note, created_at
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """,
         (
             batch_no,
@@ -33,6 +40,11 @@ def insert_batch(
             counts["projected_alive"],
             counts["projected_deleted"],
             counts["max_seq"],
+            epoch_after,
+            epoch_bumped_from,
+            epoch_bumped_to,
+            epoch_rejected,
+            epoch_bypassed,
             note,
             created_at,
         ),
@@ -64,8 +76,9 @@ def insert_applied_event(
     conn.execute(
         """
         INSERT INTO applied_events(
-            batch_id, stream_id, event_id, entity_key, op, seq, event_time, result, created_at
-        ) VALUES (?,?,?,?,?,?,?,?,?)
+            batch_id, stream_id, event_id, entity_key, op, seq, event_time,
+            epoch, result, created_at
+        ) VALUES (?,?,?,?,?,?,?,?,?,?)
         """,
         (
             batch_id,
@@ -75,6 +88,7 @@ def insert_applied_event(
             event["op"],
             event["seq"],
             event["event_time"],
+            int(event.get("epoch", 1)),
             event["result"],
             created_at,
         ),

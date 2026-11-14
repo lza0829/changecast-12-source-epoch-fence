@@ -10,13 +10,13 @@ onMounted(async () => {
 <template>
   <div class="page">
     <h1>缓冲区</h1>
-    <p class="muted">乱序/晚到事件缓冲表。底座空挂，窗内缓冲与逾窗策略留给后题。</p>
+    <p class="muted">乱序/晚到事件缓冲表。底座空挂；世代提升时按策略拒绝（rejected_on_bump）或迁入旁路（migrated_on_bump）。</p>
     <p v-if="err" class="tag danger">{{ err }}</p>
     <div class="panel">
       <table>
         <thead>
           <tr>
-            <th>流</th><th>event_id</th><th>实体键</th><th>op</th><th>seq</th><th>状态</th><th>入缓时间</th>
+            <th>流</th><th>event_id</th><th>实体键</th><th>op</th><th>seq</th><th>epoch</th><th>状态</th><th>入缓时间</th>
           </tr>
         </thead>
         <tbody>
@@ -26,10 +26,11 @@ onMounted(async () => {
             <td class="mono">{{ r.entity_key }}</td>
             <td class="mono">{{ r.op }}</td>
             <td class="mono">{{ r.seq }}</td>
+            <td class="mono">{{ r.epoch }}</td>
             <td><span class="tag warn">{{ r.status }}</span></td>
             <td class="mono">{{ r.buffered_at }}</td>
           </tr>
-          <tr v-if="!rows.length"><td colspan="7" class="muted">当前无缓冲事件（底座默认按 seq 直接投影）。</td></tr>
+          <tr v-if="!rows.length"><td colspan="8" class="muted">当前无缓冲事件（底座默认按 seq 直接投影）。</td></tr>
         </tbody>
       </table>
     </div>

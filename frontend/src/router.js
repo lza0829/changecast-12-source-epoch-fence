@@ -6,6 +6,7 @@ import Projections from './pages/Projections.vue'
 import Batches from './pages/Batches.vue'
 import Events from './pages/Events.vue'
 import Buffer from './pages/Buffer.vue'
+import Epoch from './pages/Epoch.vue'
 import Settings from './pages/Settings.vue'
 
 export default createRouter({
@@ -18,6 +19,7 @@ export default createRouter({
     { path: '/batches', component: Batches },
     { path: '/events', component: Events },
     { path: '/buffer', component: Buffer },
+    { path: '/epoch', component: Epoch },
     { path: '/settings', component: Settings },
   ],
 })

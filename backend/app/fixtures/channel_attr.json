@@ -1,42 +1,72 @@
-[
-  {
-    "event_id": "ch-001",
-    "entity_key": "APP",
-    "op": "upsert",
-    "seq": 1,
-    "event_time": "2026-01-05T00:00:00Z",
-    "payload": {"label": "手机应用", "active": true}
-  },
-  {
-    "event_id": "ch-002",
-    "entity_key": "WEB",
-    "op": "upsert",
-    "seq": 2,
-    "event_time": "2026-01-05T00:10:00Z",
-    "payload": {"label": "官网", "active": true}
-  },
-  {
-    "event_id": "ch-003",
-    "entity_key": "POS",
-    "op": "upsert",
-    "seq": 3,
-    "event_time": "2026-01-06T02:00:00Z",
-    "payload": {"label": "门店收银", "active": true}
-  },
-  {
-    "event_id": "ch-004",
-    "entity_key": "WEB",
-    "op": "upsert",
-    "seq": 4,
-    "event_time": "2026-01-07T01:00:00Z",
-    "payload": {"label": "官网改版", "active": true}
-  },
-  {
-    "event_id": "ch-005",
-    "entity_key": "POS",
-    "op": "delete",
-    "seq": 5,
-    "event_time": "2026-01-08T03:00:00Z",
-    "payload": null
-  }
-]
+{
+  "stages": [
+    {
+      "stage": 1,
+      "declared_epoch": 1,
+      "title": "第一世代渠道属性",
+      "events": [
+        {
+          "event_id": "ch-001",
+          "entity_key": "APP",
+          "op": "upsert",
+          "seq": 1,
+          "epoch": 1,
+          "event_time": "2026-01-05T00:00:00Z",
+          "payload": {"label": "手机应用", "active": true}
+        },
+        {
+          "event_id": "ch-002",
+          "entity_key": "WEB",
+          "op": "upsert",
+          "seq": 2,
+          "epoch": 1,
+          "event_time": "2026-01-05T00:10:00Z",
+          "payload": {"label": "官网", "active": true}
+        },
+        {
+          "event_id": "ch-003",
+          "entity_key": "POS",
+          "op": "upsert",
+          "seq": 3,
+          "epoch": 1,
+          "event_time": "2026-01-06T02:00:00Z",
+          "payload": {"label": "门店收银", "active": true}
+        }
+      ]
+    },
+    {
+      "stage": 2,
+      "declared_epoch": 2,
+      "title": "第二世代：渠道下线与旧世代迟到复写",
+      "events": [
+        {
+          "event_id": "ch-004",
+          "entity_key": "WEB",
+          "op": "upsert",
+          "seq": 4,
+          "epoch": 2,
+          "event_time": "2026-01-07T01:00:00Z",
+          "payload": {"label": "官网改版", "active": true}
+        },
+        {
+          "event_id": "ch-005",
+          "entity_key": "POS",
+          "op": "delete",
+          "seq": 5,
+          "epoch": 2,
+          "event_time": "2026-01-08T03:00:00Z",
+          "payload": null
+        },
+        {
+          "event_id": "ch-002-late",
+          "entity_key": "WEB",
+          "op": "upsert",
+          "seq": 2,
+          "epoch": 1,
+          "event_time": "2026-01-05T00:10:00Z",
+          "payload": {"label": "官网", "active": true}
+        }
+      ]
+    }
+  ]
+}

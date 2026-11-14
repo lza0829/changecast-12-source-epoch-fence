@@ -17,7 +17,7 @@ onMounted(async () => {
         <thead>
           <tr>
             <th>ID</th><th>编码</th><th>标题</th><th>业务域</th>
-            <th>实体键</th><th>载荷字段</th><th>夹具</th><th>水位 seq</th><th>启用</th>
+            <th>实体键</th><th>载荷字段</th><th>夹具</th><th>当前 epoch</th><th>水位 seq</th><th>启用</th>
           </tr>
         </thead>
         <tbody>
@@ -29,6 +29,7 @@ onMounted(async () => {
             <td class="mono">{{ s.entity_key_name }}</td>
             <td class="mono">{{ s.payload_fields.join(', ') }}</td>
             <td class="mono">{{ s.fixture }}</td>
+            <td class="mono">{{ s.current_epoch }}</td>
             <td class="mono">{{ s.watermark_seq }}</td>
             <td><span class="tag" :class="s.enabled ? 'ok' : 'danger'">{{ s.enabled ? '是' : '否' }}</span></td>
           </tr>
